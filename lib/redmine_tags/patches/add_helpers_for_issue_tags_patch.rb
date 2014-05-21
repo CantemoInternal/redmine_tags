@@ -16,13 +16,15 @@
 # You should have received a copy of the GNU General Public License
 # along with redmine_tags.  If not, see <http://www.gnu.org/licenses/>.
 
+# This module patches a controller so that the methods from TagsHelper and
+# IssuesTagsHelper are available in its views.
 module RedmineTags
-  module Hooks
-    class ViewsIssuesHook < Redmine::Hook::ViewListener
-      render_on :view_issues_show_details_bottom, :partial => 'issues/tags'
-      render_on :view_issues_form_details_bottom, :partial => 'issues/tags_form'
-      render_on :view_issues_sidebar_planning_bottom, :partial => 'issues/tags_sidebar'
+  module Patches
+    module AddHelpersForIssueTagsPatch
+      def self.apply(controller)
+        controller.send(:helper, 'tags')
+        controller.send(:helper, 'issues_tags')
+      end
     end
   end
 end
-

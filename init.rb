@@ -1,5 +1,5 @@
 # This file is a part of redmine_tags
-# redMine plugin, that adds tagging support.
+# Redmine plugin, that adds tagging support.
 #
 # Copyright (c) 2010 Aleksey V Zapparov AKA ixti
 #
@@ -18,17 +18,18 @@
 
 require 'redmine'
 require 'redmine_tags'
-
+require 'redmine_acts_as_taggable_on/initialize'
 
 Redmine::Plugin.register :redmine_tags do
   name        'redmine_tags'
   author      'Aleksey V Zapparov AKA "ixti"'
-  description 'redMine tagging support'
-  version     '2.0.1-dev'
+  description 'Redmine tagging support'
+  version     '2.1.0'
   url         'https://github.com/ixti/redmine_tags/'
   author_url  'http://www.ixti.net/'
 
-  requires_redmine :version_or_higher => '1.2.0'
+  requires_redmine :version_or_higher => '2.1.0'
+  requires_acts_as_taggable_on
 
   settings :default => {
     :issues_sidebar => 'none',
@@ -45,16 +46,16 @@ ActionDispatch::Callbacks.to_prepare do
     Issue.send(:include, RedmineTags::Patches::IssuePatch)
   end
 
+  [IssuesController, CalendarsController, GanttsController].each do |controller|
+    RedmineTags::Patches::AddHelpersForIssueTagsPatch.apply(controller)
+  end
+
   unless WikiPage.included_modules.include?(RedmineTags::Patches::WikiPagePatch)
     WikiPage.send(:include, RedmineTags::Patches::WikiPagePatch)
   end
 
-  unless IssuesHelper.included_modules.include?(RedmineTags::Patches::IssuesHelperPatch)
-    IssuesHelper.send(:include, RedmineTags::Patches::IssuesHelperPatch)
-  end
-
-  unless WikiHelper.included_modules.include?(RedmineTags::Patches::WikiHelperPatch)
-    WikiHelper.send(:include, RedmineTags::Patches::WikiHelperPatch)
+  unless WikiController.included_modules.include?(RedmineTags::Patches::WikiControllerPatch)
+    WikiController.send(:include, RedmineTags::Patches::WikiControllerPatch)
   end
 
   unless AutoCompletesController.included_modules.include?(RedmineTags::Patches::AutoCompletesControllerPatch)

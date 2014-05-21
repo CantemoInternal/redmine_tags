@@ -1,5 +1,5 @@
 # This file is a part of redmine_tags
-# redMine plugin, that adds tagging support.
+# Redmine plugin, that adds tagging support.
 #
 # Copyright (c) 2010 Aleksey V Zapparov AKA ixti
 #
@@ -15,6 +15,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with redmine_tags.  If not, see <http://www.gnu.org/licenses/>.
+
+require 'digest/md5'
 
 module TagsHelper
   include ActsAsTaggableOn::TagsHelper
@@ -45,7 +47,8 @@ module TagsHelper
   end
 
   def tag_color(tag)
-    "##{"%06x" % (tag.name.hash % 0xffffff).to_s}"
+    tag_name = tag.respond_to?(:name) ? tag.name : tag
+    "##{Digest::MD5.hexdigest(tag_name)[0..5]}"
   end
         
   # Renders list of tags
