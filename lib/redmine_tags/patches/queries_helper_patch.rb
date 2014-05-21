@@ -41,7 +41,11 @@ module RedmineTags
 
         def column_content_extended(column, issue)
           if column.name.eql? :tags
-            column.value(issue).collect{ |t| render_tag_link(t) }.join(', ')
+            begin
+              column.value(issue).collect{ |t| render_tag_link(t) }.join(', ')
+            rescue
+              column_content_original(column, issue)
+            end
           else
             column_content_original(column, issue)
           end
